@@ -1,0 +1,6 @@
+[submodule "lib/esp32-oled"]
+	path = lib/esp32-oled
+	url = git@github.com:jhasselbring/esp32-oled.git
+[submodule "lib/esp32-time"]
+	path = lib/esp32-time
+	url = git@github.com:jhasselbring/esp32-time.git
