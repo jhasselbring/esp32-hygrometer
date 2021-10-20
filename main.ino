@@ -3,8 +3,8 @@
 #include "esp_sleep.h"
 #include <HTTPClient.h>
 #include <DHT.h>
-#include "esp32-oled/main.c"
-#include "esp32-time/main.c"
+#include "lib/esp32-oled/main.c"
+#include "lib/esp32-time/main.c"
 
 #define MYLED 25
 #define DHTPIN 21
