@@ -11,6 +11,7 @@
 #define DHTTYPE DHT22
 
 DHT dht(DHTPIN, DHTTYPE);
+
 // Define classes
 OLED oled;
 Time t;
