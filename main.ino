@@ -9,7 +9,7 @@
 #define MYLED 25
 #define DHTPIN 21
 #define DHTTYPE DHT22
-
+#define CYCLETIME 30
 DHT dht(DHTPIN, DHTTYPE);
 
 // Define classes
@@ -17,7 +17,13 @@ OLED oled;
 Time t;
 
 String serverPath = "https://api.ipify.org/?format=string";
-String version = "Firmware v0.2.32";
+String version = "Firmware v0.2.36";
+
+// Define global variables
+float temperature = 0.00;
+float humidity = 0.00;
+int secondCounter = 30;
+String loadingBar = "";
 
 void setup()
 {
@@ -25,41 +31,70 @@ void setup()
     showInitialLogs();
     // connectToWiFi();
     initializeLED();
-    // Start Dev
     dht.begin();
-    // End Dev
 }
 
 void loop()
 {
+    // Clear screen
     oled.clear();
+
+    // Start blink LED
     digitalWrite(MYLED, !digitalRead(MYLED));
-    Serial.println(version);
-    // Start Dev
-    // delay(10000);
-    // Let the library get the Temperature that DHT11 probe is measuring.
+
+    // Read hygrometer and update global variable
+    readUpdateHygrometer();
+    // End blink LED
+    digitalWrite(MYLED, !digitalRead(MYLED));
+    displayReadings();
+    showLoadingBar();
+    oled.echo("Sending in " + String(secondCounter) + " seconds.");
+    // fireTheHttpRequest();
+    delay(1000);
+
+    // Cycle the secondCounter
+    secondCounter--;
+
+    if (secondCounter <= 0)
+    {
+        secondCounter = 30;
+    }
+}
+
+void showLoadingBar()
+{
+    loadingBar = "";
+    int i = 0;
+    while (i <= secondCounter)
+    {
+        loadingBar = loadingBar + "|";
+        i++;
+    }
+    oled.echo(loadingBar);
+}
+void readUpdateHygrometer()
+{
     float t = dht.readTemperature();
     if (isnan(t))
     {
-        t = -1; // if so, check the connection of your DHT11 sensor... something is disconnected ;-)
+        t = -1;
     }
+    float f = (t * 9 / 5) + 32;
+
+    temperature = f;
+
     float h = dht.readHumidity();
     if (isnan(h))
     {
-        h = -1; // if so, check the connection of your DHT11 sensor... something is disconnected ;-)
+        h = -1;
     }
-    digitalWrite(MYLED, !digitalRead(MYLED));
-    // delay(1000);
-    float f = (t * 9/5) + 32;
-    oled.echo("Temperature: " + String(f));
-    oled.echo("Humidity: " + String(h));
-    // End dev
-
-    // fireTheHttpRequest();
-    // lightupLedThenSleep();
-    delay(500);
+    humidity = h;
 }
-
+void displayReadings()
+{
+    oled.echo("Temperature: " + String(temperature));
+    oled.echo("Humidity: " + String(humidity));
+}
 void enableLogging()
 {
     // Enable serial
@@ -127,11 +162,4 @@ void fireTheHttpRequest()
     {
         Serial.println("WiFi Disconnected");
     }
-}
-void lightupLedThenSleep()
-{
-    // Toggle LED every cycle
-    digitalWrite(MYLED, !digitalRead(MYLED));
-    delay(t.mSeconds(3)); // Let the LED light up for 3 seconds
-    esp_deep_sleep(t.uSeconds(30));
 }
