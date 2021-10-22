@@ -16,7 +16,7 @@ OLED oled;
 Time t;
 
 String serverPath = "https://api.ipify.org/?format=string";
-String version = "Firmware v0.2.29";
+String version = "Firmware v0.2.32";
 
 void setup()
 {
@@ -31,25 +31,24 @@ void setup()
 
 void loop()
 {
+    oled.clear();
     digitalWrite(MYLED, !digitalRead(MYLED));
-    delay(5000);
     Serial.println(version);
     // Start Dev
-    oled.clear();
     // delay(10000);
     // Let the library get the Temperature that DHT11 probe is measuring.
     float t = dht.readTemperature();
-    // if (isnan(t))
-    // {
-    //     t = -1; // if so, check the connection of your DHT11 sensor... something is disconnected ;-)
-    // }
+    if (isnan(t))
+    {
+        t = -1; // if so, check the connection of your DHT11 sensor... something is disconnected ;-)
+    }
     float h = dht.readHumidity();
-    // if (isnan(h))
-    // {
-    //     h = -1; // if so, check the connection of your DHT11 sensor... something is disconnected ;-)
-    // }
+    if (isnan(h))
+    {
+        h = -1; // if so, check the connection of your DHT11 sensor... something is disconnected ;-)
+    }
     digitalWrite(MYLED, !digitalRead(MYLED));
-    delay(1000);
+    // delay(1000);
     float f = (t * 9/5) + 32;
     oled.echo("Temperature: " + String(f));
     oled.echo("Humidity: " + String(h));
@@ -57,6 +56,7 @@ void loop()
 
     // fireTheHttpRequest();
     // lightupLedThenSleep();
+    delay(500);
 }
 
 void enableLogging()
